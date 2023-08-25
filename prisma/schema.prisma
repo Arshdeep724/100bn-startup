@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  firstName String
+  lastName  String
+  email     String   @unique
+  Wallet    Wallet?
+  groupIds  String[] @db.ObjectId
+  groups    Group[]  @relation(fields: [groupIds], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Wallet {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float         @default(0)
+  user          User?         @relation(fields: [userId], references: [id])
+  userId        String        @unique @db.ObjectId
+  Tranasactions Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+}
+
+model Transaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float
+  Wallet    Wallet?  @relation(fields: [walletId], references: [id])
+  walletId  String?  @unique @db.ObjectId
+  Group     Group?   @relation(fields: [groupId], references: [id])
+  groupId   String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Group {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  userIds           String[]      @db.ObjectId
+  users             User[]        @relation(fields: [userIds], references: [id])
+  groupTransactions Transaction[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
+}
+
+model Balances {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  lenderUserId   String   @db.ObjectId
+  borrowerUserId String   @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+}
