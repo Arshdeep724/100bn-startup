@@ -8,42 +8,22 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  phone     String   @unique
-  firstName String
-  lastName  String
-  email     String   @unique
-  Wallet    Wallet?
-  groupIds  String[] @db.ObjectId
-  groups    Group[]  @relation(fields: [groupIds], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-}
-
-model Wallet {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  amount        Float         @default(0)
-  user          User?         @relation(fields: [userId], references: [id])
-  userId        String        @unique @db.ObjectId
-  Tranasactions Transaction[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
-}
-
-model Transaction {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  amount    Float
-  Wallet    Wallet?  @relation(fields: [walletId], references: [id])
-  walletId  String?  @unique @db.ObjectId
-  Group     Group?   @relation(fields: [groupId], references: [id])
-  groupId   String?  @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone        String   @unique
+  firstName    String
+  lastName     String
+  email        String   @unique
+  walletAmount Float    @default(0)
+  groupIds     String[] @db.ObjectId
+  groups       Group[]  @relation(fields: [groupIds], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 }
 
 model Group {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
   name              String
+  createdByUserId   String        @db.ObjectId
   userIds           String[]      @db.ObjectId
   users             User[]        @relation(fields: [userIds], references: [id])
   groupTransactions Transaction[]
@@ -51,10 +31,51 @@ model Group {
   updatedAt         DateTime      @default(now()) @updatedAt
 }
 
-model Balances {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  lenderUserId   String   @db.ObjectId
-  borrowerUserId String   @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
+model Transaction {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  lenderUserId     String             @db.ObjectId
+  borrowerUserId   String             @db.ObjectId
+  lenderUserName   String
+  borrowerUserName String
+  description      String
+  status           ETransactionStatus @default(PENDING)
+  categoryId       String?
+  subCategoryId    String?
+  categoryName     String?
+  subCategoryName  String?
+  groupId          String?            @default("") @db.ObjectId
+  Group            Group?             @relation(fields: [groupId], references: [id])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+}
+
+model Category {
+  id            String               @id @map("_id")
+  name          ETransactionCategory
+  subcategories SubCategory[]
+}
+
+model SubCategory {
+  id         String                  @id @map("_id")
+  name       ETransactionSubCategory
+  Category   Category?               @relation(fields: [categoryId], references: [id])
+  categoryId String?
+}
+
+enum ETransactionStatus {
+  PENDING
+  COMPLETED
+  DELETED
+  CANCELLED
+}
+
+enum ETransactionCategory {
+  MISCELLANEOUS
+  FOOD
+  TRAVEL
+  TRANSFER
+}
+
+enum ETransactionSubCategory {
+  GENERAL
 }
