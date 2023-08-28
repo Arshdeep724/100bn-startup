@@ -8,7 +8,7 @@ type PrismaTransactionClient = Omit<
 >;
 
 @Injectable()
-export class ReputationRepository {
+export class RootRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(user: CreateUserDto) {
@@ -60,7 +60,7 @@ export class ReputationRepository {
     });
   }
 
-  async addUserToGroup(userId: string,groupId: string) {
+  async addUserToGroup(userId: string, groupId: string) {
     await this.prisma.group.update({
       where: {
         id: groupId,
@@ -68,10 +68,23 @@ export class ReputationRepository {
       data: {
         users: {
           connect: {
-            id: userId
-          }
-        }
-      }
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * FOR DEV (Arshdeep Singh) ONLY
+   */
+  async deleteAll() {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.category.deleteMany();
+      await tx.subCategory.deleteMany();
+      await tx.transaction.deleteMany();
+      await tx.group.deleteMany();
+      await tx.user.deleteMany();
     })
   }
 }
