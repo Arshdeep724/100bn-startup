@@ -1,8 +1,16 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Query,
+  Get,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateGroupDto, CreateTransactionDto, CreateUserDto } from 'src/dtos';
 import {
-    AddUserToGroupCommand,
+  AddUserToGroupCommand,
   CreateGroupCommand,
   CreateTransactionCommand,
   CreateUserCommand,
@@ -38,17 +46,12 @@ export class RootController {
   }
 
   @Post('group/:groupId/add/:userId ')
-  async addUserToGroup(@Param('groupId') groupId: string,@Param('userId') userId: string) {
+  async addUserToGroup(
+    @Param('groupId') groupId: string,
+    @Param('userId') userId: string,
+  ) {
     return this.commandBus.execute<AddUserToGroupCommand>(
-      new AddUserToGroupCommand(userId,groupId),
+      new AddUserToGroupCommand(userId, groupId),
     );
-  }
-
-  /**
-   * FOR DEV (Arshdeep Singh) ONLY
-   */
-  @Post('test')
-  async testFn() {
-    return this.repo.deleteAll()
   }
 }
