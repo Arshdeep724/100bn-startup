@@ -75,6 +75,18 @@ export class RootRepository {
     });
   }
 
+  async testt() {
+    // await this.prisma.transaction.create({
+    //   data: {
+    //     borrowerUserId: '64ec9d372e2e8696f7eb05e8',
+    //     lenderUserId: '64ec9d433268c33c77d4cf0a',
+    //     description: 's',
+    //     borrowerUserName: 'sa',
+    //     lenderUserName: '13'
+    //   }
+    // })
+    return this.prisma.transaction.findMany();
+  }
   /**
    * FOR DEV (Arshdeep Singh) ONLY
    */
